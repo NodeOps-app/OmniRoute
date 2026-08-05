@@ -40,7 +40,7 @@ jobs:
 
   k6-soak:
     name: k6 load/soak
-    runs-on: [createos]
+    runs-on: [createos-8vcpu-16gb]
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
@@ -87,7 +87,7 @@ jobs:
     # so it self-builds — hence the generous job timeout. REQUIRE_AXE=1 makes the suite run
     # the real axe analysis (the 4 page tests are gated to nightly so per-PR e2e stays fast)
     # and makes the meta-test fail loudly if @axe-core/playwright ever goes missing.
-    runs-on: [createos]
+    runs-on: [createos-8vcpu-16gb]
     timeout-minutes: 30
     env:
       JWT_SECRET: ci-test-secret-with-sufficient-length-for-validation
@@ -109,6 +109,14 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
           restore-keys: playwright-chromium-${{ runner.os }}-
+      - name: Restore true OS identity for apt dep resolution
+        # createos runners report themselves as Ubuntu 22.04 for actions/setup-python
+        # compat (see createos-sandbox-ghar AGENTS.md); Playwright's --with-deps reads
+        # /etc/os-release to pick its package manifest and, believing it's Ubuntu, pulls
+        # jammy-only packages (e.g. xfonts-cyrillic) that don't exist in the real Debian
+        # bookworm apt repos. Playwright supports Debian 12 natively, so restoring the
+        # stashed truth just for this step lets it pick the correct (working) manifest.
+        run: cp /etc/os-release.debian /etc/os-release 2>/dev/null || true
       - run: npx playwright install --with-deps chromium
       - name: Run axe a11y suite (self-building webServer)
         run: npx playwright test tests/e2e/a11y.spec.ts

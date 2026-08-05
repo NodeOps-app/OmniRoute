@@ -10,7 +10,7 @@ permissions:
 jobs:
   stryker:
     name: Stryker mutation (batch ${{ matrix.batch.name }} — advisory)
-    runs-on: [createos]
+    runs-on: [createos-8vcpu-16gb]
     # Mutation testing is expensive. History of the budget:
     #   - Full 8-module set TIMED OUT at the 180min cap (run 27705123780 = exactly 180min).
     #     The two god-files chatCore.ts/combo.ts dominated ~2/3 of the mutants and were

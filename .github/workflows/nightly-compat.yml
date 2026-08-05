@@ -59,7 +59,7 @@ jobs:
 
   compat-build-26:
     name: Node 26 Compatibility Build
-    runs-on: [createos]
+    runs-on: [createos-8vcpu-16gb]
     timeout-minutes: 25
     needs: resolve-branch
     steps:
@@ -89,7 +89,7 @@ jobs:
 
   compat-tests:
     name: Node ${{ matrix.node }} Compat Tests (${{ matrix.shard }}/4)
-    runs-on: [createos]
+    runs-on: [createos-8vcpu-16gb]
     timeout-minutes: 25
     needs: resolve-branch
     strategy:
