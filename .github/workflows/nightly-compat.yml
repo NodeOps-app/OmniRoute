@@ -28,7 +28,8 @@ concurrency:
 jobs:
   resolve-branch:
     name: Resolve active release branch
-    runs-on: ubuntu-latest
+    runs-on: [createos]
+    timeout-minutes: 10
     outputs:
       target: ${{ steps.branch.outputs.target }}
     steps:
@@ -58,7 +59,7 @@ jobs:
 
   compat-build-26:
     name: Node 26 Compatibility Build
-    runs-on: ubuntu-latest
+    runs-on: [createos]
     timeout-minutes: 25
     needs: resolve-branch
     steps:
@@ -88,7 +89,7 @@ jobs:
 
   compat-tests:
     name: Node ${{ matrix.node }} Compat Tests (${{ matrix.shard }}/4)
-    runs-on: ubuntu-latest
+    runs-on: [createos]
     timeout-minutes: 25
     needs: resolve-branch
     strategy:
@@ -116,7 +117,8 @@ jobs:
 
   report:
     name: Open / update tracking issue on failure
-    runs-on: ubuntu-latest
+    runs-on: [createos]
+    timeout-minutes: 10
     if: ${{ !cancelled() && (needs.compat-tests.result == 'failure' || needs.compat-build-26.result == 'failure') }}
     needs: [resolve-branch, compat-build-26, compat-tests]
     permissions:
